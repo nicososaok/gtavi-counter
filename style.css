@@ -1,0 +1,82 @@
+/* Creamos un contenedor superior hero */
+.hero-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 45vh;
+  background: url('gta-vi.jpg') no-repeat center bottom;
+  background-size: cover;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+  z-index: 0;
+}
+
+/* Custom Neon Text Shadow & Gradients (Estilo clásico original) */
+.gta-title-gradient {
+  background: linear-gradient(105deg, #fff4e9 4%, #ff9a72 36%, #ff6fae 68%, #69d9d0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 30px rgba(255, 111, 174, 0.35));
+}
+
+/* Noise overlay */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+
+/* Background mode transition */
+.bg-image-layer {
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animación para las motas de polvo estelar / partículas */
+@keyframes float-particle {
+  0% {
+    transform: translateY(105vh) translateX(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(40px);
+    opacity: 0;
+  }
+}
+
+.particle {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: float-particle linear infinite;
+  pointer-events: none;
+}
+
+/* ==========================================
+   MODO NEÓN EXTREMO (Toggle de Tema)
+   ========================================== */
+body.neon-mode {
+  background-color: #030008 !important;
+}
+
+/* Efecto Neón Extremo para el título GTA VI (Corregido para texto transparente) */
+body.neon-mode .gta-title-gradient {
+  background: linear-gradient(105deg, #ffffff 0%, #ff007f 50%, #00ffff 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 35px rgba(0, 255, 255, 0.7)) !important;
+}
+
+/* Tarjetas del contador y footer en modo neón */
+body.neon-mode .counter-card,
+body.neon-mode #footer-card {
+  border-color: rgba(0, 255, 255, 0.25) !important;
+  background-color: rgba(5, 2, 15, 0.85) !important;
+}

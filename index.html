@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090909" />
+    <title>GTA VI — Time in Development</title>
+
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'system-ui', 'sans-serif']
+            },
+            colors: {
+              viceBg: '#0d0a18',
+              viceAccent: '#ff9a72',
+              vicePink: '#ff6fae',
+              viceAqua: '#69d9d0',
+              vicePurple: '#2d1b4e'
+            },
+            animation: {
+              'pulse-fast': 'pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glow-drift': 'drift 8s ease-in-out infinite alternate'
+            },
+            keyframes: {
+              drift: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '100%': { transform: 'translate(20px, -20px) scale(1.08)' }
+              }
+            }
+          }
+        }
+      };
+    </script>
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    class="bg-viceBg text-slate-100 font-sans min-h-screen flex flex-col justify-between overflow-x-hidden relative selection:bg-vicePink selection:text-white"
+  >
+    <!-- Noise Overlay -->
+    <div class="grain fixed inset-0 opacity-[0.04] pointer-events-none z-10"></div>
+
+    <!-- Dynamic Full Ambient Background Image (Mode 1) -->
+    <div id="full-bg-layer" class="bg-image-layer fixed inset-0 z-0 opacity-0 pointer-events-none">
+      <img
+        id="bg-image-element"
+        src="gta-vi.jpg"
+        alt="Vice City Ambient Background"
+        class="w-full h-full object-cover object-center scale-105 filter brightness-90 contrast-105"
+        onerror="this.src = 'https://placehold.co/1920x1080/100d1c/ff6fae?text=GTA+VI+Vice+City'"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-viceBg via-viceBg/65 to-viceBg/40"></div>
+      <div class="absolute inset-0 bg-radial from-transparent via-viceBg/20 to-viceBg/80"></div>
+    </div>
+
+    <!-- Ambient Glow Orbs -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div class="absolute -top-32 -left-32 w-[30rem] h-[30rem] bg-vicePink/20 rounded-full blur-[100px] animate-glow-drift"></div>
+      <div
+        class="absolute top-1/3 -right-32 w-[35rem] h-[35rem] bg-viceAccent/15 rounded-full blur-[120px] animate-glow-drift"
+        style="animation-delay: -3s"
+      ></div>
+      <div
+        class="absolute -bottom-32 left-1/4 w-[40rem] h-[40rem] bg-viceAqua/15 rounded-full blur-[140px] animate-glow-drift"
+        style="animation-delay: -5s"
+      ></div>
+    </div>
+
+    <!-- Contenedor de partículas flotantes (Motas retro) -->
+    <div id="particles-container" class="fixed inset-0 z-0 pointer-events-none overflow-hidden"></div>
+
+    <!-- Top Navigation & Image Mode Controls -->
+    <header class="relative z-20 w-full max-w-7xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-vicePink to-viceAccent flex items-center justify-center shadow-lg shadow-vicePink/30">
+          <i class="fa-solid fa-gamepad text-white text-lg"></i>
+        </div>
+        <span class="font-bold tracking-wider text-xs sm:text-sm text-slate-200 uppercase drop-shadow">Rockstar Games Tracker</span>
+      </div>
+
+      <!-- Controls Group -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <button
+          id="theme-toggle-btn"
+          class="px-3.5 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5 shadow-2xl"
+        >
+          <i id="theme-icon" class="fa-solid fa-moon text-viceAqua"></i>
+          <span class="hidden sm:inline">Modo Neón</span>
+        </button>
+
+        <div class="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-full border border-white/10 text-xs font-semibold shadow-2xl">
+          <span class="px-3 py-1 text-slate-400 hidden sm:inline"><i class="fa-solid fa-image mr-1.5"></i> Visual Mode:</span>
+          <button
+            id="btn-mode-full"
+            class="px-3.5 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5 bg-gradient-to-r from-vicePink to-viceAccent text-white shadow-md"
+          >
+            <i class="fa-solid fa-expand text-[10px]"></i> Background Cover
+          </button>
+          <button
+            id="btn-mode-footer"
+            class="px-3.5 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-white/5"
+          >
+            <i class="fa-solid fa-box text-[10px]"></i> Footer Embedded
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content & Counter Area -->
+    <main class="relative z-20 my-auto w-full max-w-5xl mx-auto px-4 py-8 text-center flex flex-col items-center">
+      <div
+        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/60 border border-white/10 backdrop-blur-md text-viceAccent font-extrabold text-[11px] sm:text-xs uppercase tracking-[0.25em] mb-4 shadow-sm"
+      >
+        <i class="fa-solid fa-hourglass-half animate-spin" style="animation-duration: 6s"></i>
+        Calculadora de Desarrollo
+      </div>
+
+      <!-- Main Title -->
+      <h1 class="gta-title-gradient font-black italic tracking-tighter text-6xl sm:text-8xl lg:text-[10rem] leading-none select-none my-2">GTA VI</h1>
+
+      <p class="mt-2 mb-8 text-slate-200 text-sm sm:text-base max-w-xl font-normal leading-relaxed drop-shadow">
+        El contador en tiempo real, no oficial del periodo acumulado en desarrollo.
+      </p>
+
+      <!-- Start Reference Date Preset Buttons & Tooltips -->
+      <div class="w-full max-w-xl mb-8">
+        <div class="text-xs uppercase tracking-wider text-slate-300 font-semibold mb-3 flex items-center justify-center gap-2 drop-shadow">
+          <span>Seleccionar Hito de Inicio:</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <!-- Botón 1 -->
+          <div class="relative hito-wrapper">
+            <button
+              data-start="2014-01-01"
+              data-desc="Primeras ideas, conceptos iniciales y preproducción tras el lanzamiento de GTA V en 2013."
+              class="preset-btn active w-full px-3 py-2 rounded-xl border border-vicePink/50 bg-vicePink/30 backdrop-blur-md text-white font-medium transition-all hover:bg-vicePink/40"
+            >
+              Concepto (2014)
+            </button>
+            <div
+              class="tooltip-box pointer-events-none opacity-0 transition-opacity duration-200 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 rounded-lg bg-slate-950/95 border border-vicePink/40 text-[11px] text-slate-200 shadow-xl z-30 hidden sm:block"
+            >
+              Preproducción e ideas iniciales tras lanzar GTA V.
+            </div>
+          </div>
+
+          <!-- Botón 2 -->
+          <div class="relative hito-wrapper">
+            <button
+              data-start="2018-11-01"
+              data-desc="Tras lanzar Red Dead Redemption 2 en octubre de 2018, el estudio volcó sus recursos principales a GTA VI."
+              class="preset-btn w-full px-3 py-2 rounded-xl border border-white/15 bg-slate-900/50 backdrop-blur-md text-slate-200 font-medium transition-all hover:bg-white/15 hover:text-white"
+            >
+              Post-RDR2 (2018)
+            </button>
+            <div
+              class="tooltip-box pointer-events-none opacity-0 transition-opacity duration-200 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 rounded-lg bg-slate-950/95 border border-vicePink/40 text-[11px] text-slate-200 shadow-xl z-30 hidden sm:block"
+            >
+              Inicio de producción principal tras Red Dead Redemption 2.
+            </div>
+          </div>
+
+          <!-- Botón 3 -->
+          <div class="relative hito-wrapper">
+            <button
+              data-start="2022-02-04"
+              data-desc="Rockstar Games confirmó públicamente por primera vez que el desarrollo estaba 'bien en marcha'."
+              class="preset-btn w-full px-3 py-2 rounded-xl border border-white/15 bg-slate-900/50 backdrop-blur-md text-slate-200 font-medium transition-all hover:bg-white/15 hover:text-white"
+            >
+              Oficial (2022)
+            </button>
+            <div
+              class="tooltip-box pointer-events-none opacity-0 transition-opacity duration-200 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 rounded-lg bg-slate-950/95 border border-vicePink/40 text-[11px] text-slate-200 shadow-xl z-30 hidden sm:block"
+            >
+              Comunicado oficial confirmando que el desarrollo estaba en marcha.
+            </div>
+          </div>
+
+          <!-- Botón 4 -->
+          <div class="relative hito-wrapper">
+            <button
+              data-start="2023-12-04"
+              data-desc="Publicación del primer tráiler oficial revelando Vice City, Lucía y Jason."
+              class="preset-btn w-full px-3 py-2 rounded-xl border border-white/15 bg-slate-900/50 backdrop-blur-md text-slate-200 font-medium transition-all hover:bg-white/15 hover:text-white"
+            >
+              Tráiler 1 (2023)
+            </button>
+            <div
+              class="tooltip-box pointer-events-none opacity-0 transition-opacity duration-200 absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 rounded-lg bg-slate-950/95 border border-vicePink/40 text-[11px] text-slate-200 shadow-xl z-30 hidden sm:block"
+            >
+              Estreno mundial del primer tráiler oficial del juego.
+            </div>
+          </div>
+        </div>
+
+        <!-- Descripción dinámica al seleccionar un hito -->
+        <p
+          id="milestone-description"
+          class="mt-3 text-xs text-viceAccent/90 bg-slate-950/50 border border-white/10 rounded-lg py-2 px-3 backdrop-blur-md transition-all duration-300"
+        >
+          Primeras ideas, conceptos iniciales y preproducción tras el lanzamiento de GTA V en 2013.
+        </p>
+      </div>
+
+      <!-- Counter Display Grid (Usando la clase counter-card dedicada) -->
+      <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 w-full" aria-label="Tiempo transcurrido">
+        <div
+          class="counter-card group relative bg-slate-900/65 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-2xl shadow-xl transition-all duration-300 hover:border-vicePink/50 hover:shadow-vicePink/20 hover:-translate-y-1"
+        >
+          <span id="years" class="block font-black text-4xl sm:text-6xl tracking-tight text-white font-mono">00</span>
+          <span class="block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-vicePink transition-colors"
+            >Años</span
+          >
+        </div>
+
+        <div
+          class="counter-card group relative bg-slate-900/65 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-2xl shadow-xl transition-all duration-300 hover:border-vicePink/50 hover:shadow-vicePink/20 hover:-translate-y-1"
+        >
+          <span id="months" class="block font-black text-4xl sm:text-6xl tracking-tight text-white font-mono">00</span>
+          <span class="block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-vicePink transition-colors"
+            >Meses</span
+          >
+        </div>
+
+        <div
+          class="counter-card group relative bg-slate-900/65 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-2xl shadow-xl transition-all duration-300 hover:border-vicePink/50 hover:shadow-vicePink/20 hover:-translate-y-1"
+        >
+          <span id="days" class="block font-black text-4xl sm:text-6xl tracking-tight text-white font-mono">00</span>
+          <span class="block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-vicePink transition-colors"
+            >Días</span
+          >
+        </div>
+
+        <div
+          class="counter-card group relative bg-slate-900/65 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-2xl shadow-xl transition-all duration-300 hover:border-vicePink/50 hover:shadow-vicePink/20 hover:-translate-y-1"
+        >
+          <span id="hours" class="block font-black text-4xl sm:text-6xl tracking-tight text-white font-mono">00</span>
+          <span class="block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-vicePink transition-colors"
+            >Horas</span
+          >
+        </div>
+
+        <div
+          class="counter-card group relative bg-slate-900/65 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-2xl shadow-xl transition-all duration-300 hover:border-vicePink/50 hover:shadow-vicePink/20 hover:-translate-y-1"
+        >
+          <span id="minutes" class="block font-black text-4xl sm:text-6xl tracking-tight text-white font-mono">00</span>
+          <span class="block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-vicePink transition-colors"
+            >Minutos</span
+          >
+        </div>
+
+        <div
+          class="counter-card group relative bg-slate-900/65 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-2xl shadow-xl transition-all duration-300 hover:border-vicePink/50 hover:shadow-vicePink/20 hover:-translate-y-1"
+        >
+          <span id="seconds" class="block font-black text-4xl sm:text-6xl tracking-tight text-white font-mono text-viceAqua">00</span>
+          <span class="block mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-300 group-hover:text-viceAqua transition-colors"
+            >Segundos</span
+          >
+        </div>
+      </section>
+
+      <div
+        class="mt-8 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/10 text-xs font-semibold tracking-wider text-slate-300 uppercase shadow-lg"
+      >
+        <span class="w-2.5 h-2.5 rounded-full bg-viceAqua shadow-[0_0_12px_#69d9d0] animate-pulse-fast"></span>
+        Estado actual: En desarrollo activo
+      </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="relative z-20 w-full max-w-5xl mx-auto px-4 pb-8 pt-4">
+      <div id="footer-card" class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/75 backdrop-blur-md transition-all duration-500 shadow-2xl">
+        <div id="footer-image-container" class="hidden relative h-48 sm:h-56 w-full overflow-hidden border-b border-white/10 group">
+          <img
+            src="gta-vi.jpg"
+            alt="GTA VI Vice City Skyline"
+            class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            onerror="this.src = 'https://placehold.co/1200x400/100d1c/ff6fae?text=GTA+VI+Vice+City+Banner'"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
+          <div class="absolute bottom-4 left-6 right-6 flex justify-between items-end">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-viceAqua block">Vice City / Leonida</span>
+              <h3 class="text-xl font-extrabold text-white">Project Americas Timeline</h3>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-black/60 text-slate-300 backdrop-blur-md border border-white/10"> Concept Artwork </span>
+          </div>
+        </div>
+
+        <div class="p-6 text-center sm:flex sm:items-center sm:justify-between gap-4 text-xs text-slate-400">
+          <div class="flex items-center justify-center sm:justify-start gap-2 mb-2 sm:mb-0">
+            <i class="fa-solid fa-shield-halved text-vicePink"></i>
+            <span class="font-bold text-slate-200">Proyecto Fan-Made</span>
+          </div>
+          <p class="tracking-wide">
+            Este sitio no está afiliado, respaldado ni asociado con <strong class="text-slate-200">Rockstar Games</strong> o
+            <strong class="text-slate-200">Take-Two Interactive</strong>.
+          </p>
+          <div class="mt-2 sm:mt-0 font-mono text-[11px] text-slate-500">GTA VI &copy; Rockstar Games</div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Botón de Audio Easter Egg -->
+    <div class="fixed bottom-4 right-4 z-30">
+      <button
+        id="audio-toggle-btn"
+        title="Activar música ambiental Synthwave"
+        class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-md text-slate-300 hover:text-white hover:border-vicePink/50 transition-all shadow-xl text-xs font-semibold"
+      >
+        <i id="audio-icon" class="fa-solid fa-volume-xmark text-vicePink"></i>
+        <span class="hidden sm:inline">Synthwave Audio</span>
+      </button>
+      <audio id="synthwave-audio" loop preload="none">
+        <source src="https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg" type="audio/ogg" />
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script src="index.js"></script>
+  </body>
+</html>
